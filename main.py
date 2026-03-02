@@ -12,7 +12,7 @@ def main():
        src.extract.extract_transit_data() 
 
         # Call functions from transform_load.py
-       
+       src.transform_load.transform_load()
 
 
 if __name__ == "__main__":
