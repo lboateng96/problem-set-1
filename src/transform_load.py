@@ -33,3 +33,43 @@ def transform_load():
 
     # Filter transit data range 10/1/2024 - 10/31/2025
     transit_df = transit_df[(transit_df['datetime'] >= '2024-10-01') & (transit_df['datetime'] <= '2025-10-31')]
+
+    # Merge df
+    merged_df = pd.merge(weather_df, transit_df, on='datetime')
+
+    # Line plot: daily ridership and avg temperature
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    ax1.plot(merged_df['datetime'], merged_df['total_rides'], color='blue', label='Total Rides')
+    ax1.set_ylabel('Total Rides', color='blue')
+    ax2 = ax1.twinx()
+    ax2.plot(merged_df['datetime'], merged_df['temp'], color='red', label='Avg Temp')
+    ax2.set_ylabel('Temperature (C)', color='red')
+    plt.title('Daily Transit Ridership and Average Temperature')
+    plt.savefig('data/line_plot.png')
+    plt.close()
+
+    # Feb 2025 df and scatterplot
+    feb2025_df = merged_df[(merged_df['datetime'] >= '2025-02-01') & (merged_df['datetime'] <= '2025-02-28')]
+    plt.figure(figsize=(8, 6))
+    plt.scatter(feb2025_df['precip'], feb2025_df['total_rides'])
+    plt.xlabel('Precipitation')
+    plt.ylabel('Total Rides')
+    plt.title('February 2025: Ridership vs Precipitation')
+    plt.savefig('data/scatter_plot.png')
+    plt.close()
+
+    # Correlation heatmap
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(merged_df.select_dtypes(include='number').corr(), annot=True, cmap='coolwarm')
+    plt.title('Correlation Heatmap of All Numeric Features')
+    plt.savefig('data/heatmap.png')
+    plt.close()
+
+    # Merge df as CSV to /data
+    merged_df.to_csv('data/merged_data.csv', index=False)
+
+    # Print statement
+    print("Trends: Ridership and temperature follow similar seasonal patterns with dips in winter months. " \
+    "In February 2025, most days had low precipitation with consistently high ridership. " \
+    "On higher precipitation days, ridership tended to decrease, suggesting extreme weather results in lower transit use. " \
+    "The heatmap shows that weather variables are strongly correlated with each other, and transit variables (bus, rail, total rides) are strongly correlated with each other, but weather and transit variables do not show a strong correlation overall.")
